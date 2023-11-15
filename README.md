@@ -129,7 +129,9 @@ Saya menggunakan elemen input ini untuk menyediakan button save yang ketika dite
 Clean Architecture adalah pendekatan pengembangan perangkat lunak yang dirancang untuk memisahkan kode menjadi lapisan-lapisan dengan tanggung jawab yang jelas. Pada aplikasi Flutter, penerapan Clean Architecture melibatkan pembagian kode ke dalam beberapa lapisan, seperti:
 
 a. Lapisan fitur/presentasi (widget, framework, UI, view models)
+
 b. Lapisan domain/bisnis (untuk logika dan aturan bisnis aplikasi seperti use cases, entities)
+
 c. Lapisan data (pengambilan data seperti data sources API/database)
 
 Dengan penerapan Clean Architecture, setiap lapisan memiliki tanggung jawab jelas dan dapat diuji secara terpisah (lapisan fitur dan bisnis saling independen). Clean Architecture membantu mencegah ketergantungan siklik antara lapisan dan memungkinkan perubahan pada satu lapisan tanpa mempengaruhi lapisan lainnya.
