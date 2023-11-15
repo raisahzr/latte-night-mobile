@@ -78,11 +78,247 @@ onTap: () {
 
 </details>
 
+<details open>
+<summary>Tugas 8</summary>
+<br>
+
+## 1. Navigator.push() vs Navigator.pushReplacement()
+`Navigator.push()` digunakan untuk menambahkan route baru ke tumpukan route, sementara `Navigator.pushReplacement()` menggantikan rute saat ini dengan rute baru. 
+
+`Navigator.push()` akan menambahkan ShopFormPage ke tumpukan route di atas MyHomePage sehingga route ShopFormPage berada di top stack:
+```
+Navigator.push(
+  context,
+  MaterialPageRoute(builder: (context) => ShopFormPage()),
+);
+```
+`Navigator.pushReplacement()` akan menghapus route ShopFormPage yang ditampikan dan menggantinya dengan route MyHomePage sehingga tidak memgubah kondisi stack:
+```
+Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(builder: (context) => MyHomePage()),
+);
+```
+
+
+## 2. Layout Widget Flutter
+| Layout Widget | Penggunaan |
+| --- | --- |
+| `Container` | Widget serbaguna, dapat menjadi wadah dan mengatur widget lain |
+| `Column` | Menyusun widget secara vertikal |
+| `Row` | Menyusun widget secara horizontal |
+| `GridView` | Menyusun widget dalam susunan grid |
+| `ListView` | Menampilkan item dengan tampilan scroll |
+| `Stack` | Menumpuk widget |
+| `Sizedbox` | Memisahkan antar elemen pada widget |
+| `Expanded`, `Flexible` | Memberi ruang sesuai berdasarkan prioritas/proporsi |
+
+
+## 3. Elemen Input Form
+**a. `TextFormField`**
+
+Saya menggunakan elemen input ini untuk menyediakan input teks bagi user (dalam hal ini atributnya mencakup nama, jumlah, harga, kategori, dan deskripsi item) dengan dekorasi placeholder dan label sehingga user dapat mengetahui keterangan input. TextFormField juga memungkinkan kita untuk melakukan validasi terhadap input user, seperti input yang tidak boleh kosong, input jumlah & harga yang harus berupa angka, dan input kategori hanya menerima 'coffee' atau 'non-coffee'.
+
+
+**b. `ElevatedButton`**
+
+Saya menggunakan elemen input ini untuk menyediakan button save yang ketika ditekan dapat menyimpan dan melakukan validasi form, kemudian setelah semua tervalidasi akan memunculkan pop up dialog berisi informasi input pengguna
+
+
+## 4. Clean Architecture Flutter
+Clean Architecture adalah pendekatan pengembangan perangkat lunak yang dirancang untuk memisahkan kode menjadi lapisan-lapisan dengan tanggung jawab yang jelas. Pada aplikasi Flutter, penerapan Clean Architecture melibatkan pembagian kode ke dalam beberapa lapisan, seperti:
+
+a. Lapisan fitur/presentasi (widget, framework, UI, view models)
+b. Lapisan domain/bisnis (untuk logika dan aturan bisnis aplikasi seperti use cases, entities)
+c. Lapisan data (pengambilan data seperti data sources API/database)
+
+Dengan penerapan Clean Architecture, setiap lapisan memiliki tanggung jawab jelas dan dapat diuji secara terpisah (lapisan fitur dan bisnis saling independen). Clean Architecture membantu mencegah ketergantungan siklik antara lapisan dan memungkinkan perubahan pada satu lapisan tanpa mempengaruhi lapisan lainnya.
+
+
+## 5. Implementasi Checklist Step by Step
+**a. Membuat halaman formulir** 
+
+Membuat file baru pada direktori `lib` dengan nama `shoplist_form.dart` :
+```
+class ShopFormPage extends StatefulWidget {
+    const ShopFormPage({super.key});
+
+    @override
+    State<ShopFormPage> createState() => _ShopFormPageState();
+}
+
+class _ShopFormPageState extends State<ShopFormPage> {
+    @override
+    Widget build(BuildContext context) {
+        return Placeholder();
+    }
+}
+```
+Untuk menambahkan elemen input sesui projek Django sebelumnya, pada class `_ShopFormPageState` pertama saya menginisiasi terlebih dahulu variabel-variabel yang dibutuhkan:
+```
+final _formKey = GlobalKey<FormState>();
+String _name = "";
+int _price = 0;
+String _description = "";
+String _category = "";
+int _amount = 0;
+```
+Kemudian untuk memunculkan form input dan melakukan validasi, di dalam body Form buatlah masing-masing input sebagai children berupa padding dari 
+```
+child: SingleChildScrollView(
+    child: Column(//children padding//)
+)
+```
+Isi paddingnya kurang lebih sama, berikut saya berikan salah satu contoh untuk input jumlah:
+```
+Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: TextFormField(
+        decoration: InputDecoration(
+            hintText: "Jumlah",
+            labelText: "Jumlah",
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.0),
+            ),
+        ),
+        onChanged: (String? value) {
+            setState(() {
+                _amount = int.parse(value!);
+            });
+        },
+        validator: (String? value) {
+        if (value == null || value.isEmpty) {
+            return "Jumlah tidak boleh kosong!";
+        }
+        if (int.tryParse(value) == null) {
+            return "Jumlah harus berupa angka!";
+        }
+        return null;
+        },
+    ),
+),
+```
+Sebagai tambahan, pada validator input kategori saya menambahkan 
+```
+if (value != "coffee" && value != "non-coffee") {
+    return "Kategori harus berupa 'coffee' atau 'non-coffee'!";
+}
+```
+Selanjutnya, untuk tombol save cukup memanfaatkan ElevatedButton:
+```
+Align(
+    alignment: Alignment.bottomCenter,
+    child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(const Color.fromARGB(255, 166, 188, 188),),
+            ),
+            ...
+            child: const Text(
+                "Save",
+                style: TextStyle(color: Colors.white),
+            ),
+        ),
+    ),
+),
+```
+
+
+**b. Mengarahkan pengguna ke halaman form tambah item baru ketika menekan tombol Tambah Item pada halaman utama**
+
+Pada class `ShopCard`` di `shop_card.dart`, bagian return Material(...) cukup melakukan routing dengan Navigator.push():
+```
+if (item.name == "Tambah Item") {
+    Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => ShopFormPage()),
+    );
+}
+```
+
+
+**c. Memunculkan data sesuai isi dari formulir yang diisi dalam sebuah pop-up setelah menekan tombol `Save` pada halaman formulir tambah item baru**
+
+Di dalam ElevatedButton pada poin (a), tambahkan kode berikut, onPressed berarti kode akan terpicu ketika tombol (save) ditekan, kemudian AlertDialog akan menampilkan informasi input dalam bentuk pop up dialog:
+```
+onPressed: () {
+    if (_formKey.currentState!.validate()) {
+    showDialog(
+        context: context,
+        builder: (context) {
+            return AlertDialog(
+                title: const Text('Produk berhasil tersimpan'),
+                content: SingleChildScrollView(
+                    child: Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start,
+                        children: [
+                        Text('Nama: $_name'),
+                        Text('Jumlah: $_amount'),
+                        Text('Harga: $_price'),
+                        Text('Kategori: $_category'),
+                        Text('Deskripsi: $_description'),
+                        ],
+                    ),
+                ),
+                actions: [
+                    TextButton(
+                        child: const Text('OK'),
+                        onPressed: () {
+                            Navigator.pop(context);
+                        },
+                    ),
+                ],
+            );
+        },
+    );
+    _formKey.currentState!.reset();
+    }
+},
+```
+
+
+**d. Membuat sebuah drawer pada aplikasi**
+
+Agar drawer memiliki dua opsi Halaman Utama dan Tambah Item, tambahkan kode berikut pada class `LeftDrawer` di `left_drawer.dart` bagian `return Drawer(...)`:
+```
+ListTile(
+    leading: const Icon(Icons.home_outlined),
+    title: const Text('Halaman Utama'),
+    // Bagian redirection ke MyHomePage
+    onTap: () {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MyHomePage(),
+            ));
+    },
+),
+ListTile(
+    leading: const Icon(Icons.add_shopping_cart),
+    title: const Text('Tambah Produk'),
+    // Bagian redirection ke ShopFormPage
+    onTap: () {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const ShopFormPage(),
+            ));
+    },
+),
+```
+Pada bagian `onTap()`, Navigator.pushReplacement berfungsi sebagai router agar ketika user menekan opsi akan diarahkan pada halaman yang sesuai.
+
+</details>
 
 <details open>
 <summary>Flutter Documentation</summary>
 <br>
+
 - [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+
 - [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
 For help getting started with Flutter development, view the
