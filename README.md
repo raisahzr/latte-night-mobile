@@ -316,6 +316,173 @@ Pada bagian `onTap()`, Navigator.pushReplacement berfungsi sebagai router agar k
 </details>
 
 <details open>
+<summary>Tugas 9</summary>
+<br>
+
+## 1. Apakah bisa kita melakukan pengambilan data JSON tanpa membuat model terlebih dahulu? Jika iya, apakah hal tersebut lebih baik daripada membuat model sebelum melakukan pengambilan data JSON?
+Bisa, kita dapat menggunakan metode dynamic tanpa perlu membuat model dahulu. Tetapi, implementasi yang lebih baik tergantung pada kebutuhan dan kompleksitas program kita. Jika kita ingin memanipulasi atau melakukan klasifikasi dengan data JSON, akan lebih efisien menggunakan model. Selain itu, untuk program yang kompleks, kelebihan lain menggunakan model adalah lebih terstruktur dan compiler dapat memberikan lapisan keamanan dengan mengetahui tipe data secara statis.
+
+
+## 2. Jelaskan fungsi dari CookieRequest dan jelaskan mengapa instance CookieRequest perlu untuk dibagikan ke semua komponen di aplikasi Flutter
+CookieRequest adalah objek untuk mengelola informasi cookie dalam permintaan HTTP di Flutter. Objek CookieRequest biasanya digunakan untuk mengelola cookie yang terkait dengan permintaan HTTP, seperti menambahkan, menghapus, atau memperbarui cookie. 
+
+Dalam konteks Flutter atau pengembangan aplikasi berbasis Flutter, kita dapat menggunakan instance CookieRequest yang perlu dibagikan ke semua komponen aplikasi, dengan tujuan menjaga konsistensi atau berbagi status otentikasi atau informasi sesi antar berbagai bagian aplikasi. Ini dapat membantu dalam menyimpan dan mengelola informasi cookie secara terpusat, sehingga berbagai bagian aplikasi dapat mengakses dan memanfaatkannya dengan mudah.
+
+
+## 3. Jelaskan mekanisme pengambilan data dari JSON hingga dapat ditampilkan pada Flutter
+
+1. Tentukan model data Flutter yang sesuai dengan struktur JSON. Model ini harus memiliki atribut yang sesuai dengan properti dalam JSON.
+2. Gunakan library serialisasi/deserialisasi JSON untuk mengubah string JSON menjadi objek Dart. Pada tugas ini, kita dapat menggunakan QuickType
+3. Membuat instance dari model data yang telah ditentukan dan map atribut-atributnya dengan nilai-nilai dari map Dart yang dihasilkan dari JSON
+4. Lakukan operasi logika atau manipulasi data yang diperlukan pada objek model yang telah dibuat
+5. Gunakan widget Flutter seperti, pada tugas ini menggunakan ListView, atau widget lainnya untuk menampilkan data ke antarmuka pengguna (UI)
+
+
+## 4. Jelaskan mekanisme autentikasi dari input data akun pada Flutter ke Django hingga selesainya proses autentikasi oleh Django dan tampilnya menu pada Flutter
+
+1. Tentukan endpoint di Django untuk login (pada authentication/url.py) yaitu /login/
+2. Mengirim data dari formulir Flutter ke Django menggunakan metode HTTP (misalnya, POST request) untuk mengirim data login dari Flutter ke endpoint API Django yang telah ditentukan
+3. Melakukan proses logika autentikasi pada Django di authentication/views.py
+4. Django akan mengembalikan respons ke Flutter dengan token akses
+5. Jika autentikasi berhasil, kita dapat menyimpan token akses dan memberi akses ke halaman MyHomePage dan menampilkan Snackbar 
+
+
+## 5. Sebutkan seluruh widget yang kamu pakai pada tugas ini dan jelaskan fungsinya masing-masing
+| Widget | Fungsi |
+| --- | --- |
+| `MaterialApp` | Widget root dari widget-tree Flutter dan menyediakan beberapa konfigurasi untuk aplikasi |
+| `Scaffold` | Kerangka dasar halaman aplikasi |
+| `Drawer` | Menampilkan menu navigasi yang dapat diakses dengan menggeser dari kiri ke kanan |
+| `DrawerHeader` | Menampilkan bagian header dari drawer |
+| `ListTile` | Menampilkan setiap item di dalam daftar drawer |
+| `SingleChildScrollView` | Membuat halaman dapat di-scroll |
+| `AppBar` | Menampilkan bar pada bagian atas aplikasi (pada tugas ini berisi nama aplikasi) |
+| `Form` | Menyimpan formulir Flutter dan menyediakan metode untuk memvalidasi, menyimpan, serta mereset aplikasi |
+| `TextFormField` | Membuat input field sehingga pengguna dapat memasukkan teks |
+| `EvelatedButton` | Membuat tombol dengan efek “terang” saat ditekan |
+| `FutureBuilder` | Menggunakan nilai yang dihasilkan oleh `Future` untuk membangun UI-nya |
+| `Key` | Mengidentifikasi suatu widget di antara widget lainnya (global) |
+| `TextField` | Membuat kotak teks tempat pengguna dapat memasukkan input |
+| `Consumer`, `Provider` | Mengonsumsi dan menyediakan objek untuk CookieRequest |
+| `Card` | Membuat layout dasar untuk menampilkan informasi dalam bentuk kartu |
+
+notes: selebihnya kurang lebih sama dengan Tugas 7
+
+
+## 6. Implementasi Checklist Step by Step
+**a. Membuat halaman login pada proyek tugas Flutter.**
+
+Membuat file baru di `screens/login.dart` yang berisi input user untuk memasukkan username dan password.
+
+
+**b. Mengintegrasikan sistem autentikasi Django dengan proyek tugas Flutter**
+
+Menginstal package yang telah disediakan dengan perintah `flutter pub add pbp_django_auth`, lalu memodifikasi root widget dalam proyek Flutter untuk menyediakan library CookieRequest ke semua child widgetnya dengan Provider.
+
+
+**c. Membuat model kustom sesuai dengan proyek aplikasi Django**
+
+Menggunakan website QuickType untuk mengkonversi bentuk model data JSON pada Django menjadi Dart. Hal ini dilakukan dengan copy data JSON melalui akses endpoint nya ke website, mengganti nama model dan bahasa menjadi Dart. Kode yang dikonversi dimasukkan pada `product.dart` di `lib/models`
+
+
+**d. Membuat halaman yang berisi daftar semua item yang terdapat pada endpoint JSON di Django yang telah kamu deploy**
+
+Install dependensi tambahan yang dibutuhkan dengan `flutter pub add http` dan izin akses internet pada `AndroidManifest.xml` di Flutter. Buat file baru `list_product.dart` pada `lib/screens`. Definisikan class `ProductPage` sebagai StatefulWidget, lalu di dalam widget menggunakan futureBuilder untuk menampilkan daftar produk pada `build()`. Flutter akan mengambil data yang sudah didapatkan dari JSON dengan `ListView.builder` dan menampilkan informasi-informasi produk tersebut. Lakukan routing dengan icon Lihat Produk di MyHomePage dan dengan LeftDrawer.
+```
+return ListView.builder(
+    itemCount: snapshot.data!.length,
+    itemBuilder: (_, index) => GestureDetector(
+        onTap: () {
+        // Navigate to detail product page when product name is clicked
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+            builder: (context) => DetailProduct(
+                productId: snapshot.data![index].pk.toString(),
+            ),
+            ),
+        );
+        },
+        child: Container(
+        margin: const EdgeInsets.symmetric(
+            horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+            Text(
+                "${snapshot.data![index].fields.name}",
+                style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+                ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+                "Amount: ${snapshot.data![index].fields.amount}"),
+            const SizedBox(height: 10),
+            Text(
+                "Price: ${snapshot.data![index].fields.price}"),
+            const SizedBox(height: 10),
+            Text("Category: ${snapshot.data![index].fields.category}"),
+            const SizedBox(height: 10),
+            Text(
+                "Description: ${snapshot.data![index].fields.description}"),
+            ],
+        ),
+        ),
+    ),
+    );
+```
+
+
+**e. Membuat halaman detail untuk setiap item yang terdapat pada halaman daftar Item**
+
+Routing dengan atribut nama produk untuk redirect ke page detail produk yang sesuai dengan navigator:
+```
+onTap: () {
+    // Navigate to detail product page when product name is clicked
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+        builder: (context) => DetailProduct(
+            productId: snapshot.data![index].pk.toString(),
+        ),
+        ),
+    );
+    },
+```
+
+Untuk menampilkan seluruh atribut model memiliki cara yang sama dengan list_product, perbedaannya hanya ketika mengambil data dari JSON, hanya ambil berdasarkan id yang sesuai (endpoint json/id). Untuk tombol yang mengarahkan kembali ke Home, saya menambahkan ElevatedButton berisi navigator:
+```
+Align(
+    alignment: Alignment.bottomCenter,
+    child: Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: ElevatedButton(
+        style: ButtonStyle(
+        backgroundColor:
+            MaterialStateProperty.all(const Color.fromARGB(255, 166, 188, 188),),
+        ),
+        onPressed: () async {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MyHomePage()),
+        );
+        },     
+        child: const Text(
+        "Home",
+        style: TextStyle(color: Colors.white),
+        ),
+    ),
+    ),
+),
+```
+
+</details>
+
+<details open>
 <summary>Flutter Documentation</summary>
 <br>
 
