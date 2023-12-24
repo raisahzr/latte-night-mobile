@@ -190,7 +190,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
                               "http://127.0.0.1:8000/create-flutter/",
                               jsonEncode(<String, String>{
                                   'name': _name,
-                                  'jumlah': _amount.toString(),
+                                  'amount': _amount.toString(),
                                   'price': _price.toString(),
                                   'category': _category, 
                                   'description': _description,
